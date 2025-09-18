@@ -141,17 +141,17 @@ if (process.env.NODE_ENV === "production") {
     // Sinon, servir le frontend
     const clientPath = path.join(__dirname, "../../client/dist/index.html");
     console.log(`Serving frontend for ${req.path}, file path: ${clientPath}`);
-    
+
     // Vérifier que le fichier existe
     if (!fs.existsSync(clientPath)) {
       console.error(`Frontend file not found: ${clientPath}`);
       return res.status(404).json({
         error: "Frontend not found",
         path: clientPath,
-        message: "The frontend build files are missing"
+        message: "The frontend build files are missing",
       });
     }
-    
+
     res.sendFile(clientPath);
   });
 } else {

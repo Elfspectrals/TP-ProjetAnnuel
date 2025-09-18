@@ -39,7 +39,10 @@ RUN ls -la dist/ && test -f dist/index.js
 RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
 RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.ts
 
-# Supprimer les dépendances de développement
+# Vérifier que le frontend est bien construit
+RUN ls -la ../client/dist/ && test -f ../client/dist/index.html
+
+# Supprimer les dépendances de développement (seulement du serveur)
 RUN npm prune --omit=dev
 
 # Rendre le script de démarrage exécutable
