@@ -27,10 +27,10 @@ if (process.env.NODE_ENV === "production") {
 
   // Try multiple possible paths for frontend files
   const possiblePaths = [
-    path.join(__dirname, "../../client/dist"),
-    path.join(process.cwd(), "client/dist"),
-    path.join("/app/client/dist"),
-    path.join("/workspace/client/dist"),
+    path.join(__dirname, "../../client/dist"),  // Development: /workspace/server/dist -> /workspace/client/dist
+    path.join(process.cwd(), "../client/dist"),  // From /workspace/server -> /workspace/client/dist
+    path.join("/workspace/client/dist"),         // Absolute workspace path
+    path.join("/app/client/dist"),               // Alternative absolute path
   ];
 
   let clientPath = null;
@@ -173,10 +173,10 @@ if (process.env.NODE_ENV === "production") {
     // Sinon, servir le frontend
     // Try multiple possible paths for index.html
     const possibleIndexPaths = [
-      path.join(__dirname, "../../client/dist/index.html"),
-      path.join(process.cwd(), "client/dist/index.html"),
-      path.join("/app/client/dist/index.html"),
-      path.join("/workspace/client/dist/index.html"),
+      path.join(__dirname, "../../client/dist/index.html"),    // Development: /workspace/server/dist -> /workspace/client/dist
+      path.join(process.cwd(), "../client/dist/index.html"),   // From /workspace/server -> /workspace/client/dist
+      path.join("/workspace/client/dist/index.html"),          // Absolute workspace path
+      path.join("/app/client/dist/index.html"),                // Alternative absolute path
     ];
 
     let indexPath = possibleIndexPaths[0]; // default
