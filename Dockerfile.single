@@ -28,13 +28,15 @@ RUN npm run build
 
 # Retourner au serveur et construire le backend
 WORKDIR /app/server
-ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl,linux-musl-openssl-3.0.x
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl-openssl-3.0.x
+RUN rm -rf node_modules/.prisma || true
+RUN rm -rf prisma/generated || true
 RUN npm run prisma:generate-all
 RUN npm run build
 
 # Vérifier que les fichiers de sortie existent
 RUN ls -la dist/ && test -f dist/index.js
-RUN ls -la node_modules/.prisma/client/ && test -f node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node
+RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
 
 # Supprimer les dépendances de développement
 RUN npm prune --omit=dev
@@ -45,8 +47,8 @@ EXPOSE 8080
 # Variables d'environnement
 ENV NODE_ENV=production
 ENV PORT=8080
-ENV PRISMA_QUERY_ENGINE_LIBRARY=/app/server/node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node
-ENV PRISMA_QUERY_ENGINE_BINARY=/app/server/node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/app/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+ENV PRISMA_QUERY_ENGINE_BINARY=/app/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
 ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl,linux-musl-openssl-3.0.x
 
 # S'assurer que nous sommes dans le bon répertoire pour le démarrage
