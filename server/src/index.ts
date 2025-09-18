@@ -24,8 +24,8 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(clientPath));
 }
 
-// Routes de base
-app.get("/", (req, res) => {
+// Route API info (déplacée vers /api)
+app.get("/api", (req, res) => {
   res.json({
     message: "API Server running!",
     timestamp: new Date().toISOString(),
