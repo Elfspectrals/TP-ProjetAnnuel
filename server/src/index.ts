@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === "production") {
   // Debug: Log current working directory and __dirname
   console.log(`Current working directory: ${process.cwd()}`);
   console.log(`__dirname: ${__dirname}`);
-  
+
   // Try multiple possible paths for frontend files
   const possiblePaths = [
     path.join(__dirname, "../../client/dist"),
@@ -37,15 +37,20 @@ if (process.env.NODE_ENV === "production") {
   console.log("Checking frontend paths:");
   for (const testPath of possiblePaths) {
     const exists = fs.existsSync(testPath);
-    console.log(`  ${testPath} - ${exists ? 'EXISTS' : 'NOT FOUND'}`);
+    console.log(`  ${testPath} - ${exists ? "EXISTS" : "NOT FOUND"}`);
     if (exists && !clientPath) {
       clientPath = testPath;
     }
   }
 
   if (!clientPath) {
-    console.error(`❌ Frontend files not found in any of the expected locations.`);
-    console.error(`Available directories in process.cwd():`, fs.readdirSync(process.cwd()));
+    console.error(
+      `❌ Frontend files not found in any of the expected locations.`
+    );
+    console.error(
+      `Available directories in process.cwd():`,
+      fs.readdirSync(process.cwd())
+    );
   } else {
     console.log(`✅ Using frontend files from: ${clientPath}`);
     app.use(express.static(clientPath));

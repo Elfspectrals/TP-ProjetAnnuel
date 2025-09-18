@@ -20,9 +20,9 @@ services:
   - key: DATABASE_URL
     value: ${db.DATABASE_URL}
   - key: PRISMA_QUERY_ENGINE_LIBRARY
-    value: /app/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+    value: /workspace/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
   - key: PRISMA_QUERY_ENGINE_BINARY
-    value: /app/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+    value: /workspace/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
   - key: PRISMA_CLI_BINARY_TARGETS
     value: debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl-openssl-3.0.x
     health_check:

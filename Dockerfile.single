@@ -3,7 +3,8 @@ FROM node:18-slim
 # Installer OpenSSL pour Prisma
 RUN apt-get update && apt-get install -y openssl && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# Use /workspace to match DigitalOcean App Platform expectations
+WORKDIR /workspace
 
 # Copier tous les fichiers package.json et les fichiers de configuration
 COPY package*.json ./
@@ -16,18 +17,18 @@ COPY server ./server/
 COPY client ./client/
 
 # Installer les dépendances du serveur
-WORKDIR /app/server
+WORKDIR /workspace/server
 RUN npm ci
 
 # Installer les dépendances du client
-WORKDIR /app/client
+WORKDIR /workspace/client
 RUN npm ci
 
 # Construire le frontend
 RUN npm run build
 
 # Retourner au serveur et construire le backend
-WORKDIR /app/server
+WORKDIR /workspace/server
 ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl-openssl-3.0.x
 RUN rm -rf node_modules/.prisma || true
 RUN rm -rf prisma/generated || true
@@ -42,9 +43,6 @@ RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.t
 # Vérifier que le frontend est bien construit
 RUN ls -la ../client/dist/ && test -f ../client/dist/index.html
 
-# Copy frontend files to workspace location (for DigitalOcean App Platform)
-RUN mkdir -p /workspace/client && cp -r ../client/dist /workspace/client/
-
 # Supprimer les dépendances de développement (seulement du serveur)
 RUN npm prune --omit=dev
 
@@ -57,12 +55,12 @@ EXPOSE 8080
 # Variables d'environnement
 ENV NODE_ENV=production
 ENV PORT=8080
-ENV PRISMA_QUERY_ENGINE_LIBRARY=/app/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
-ENV PRISMA_QUERY_ENGINE_BINARY=/app/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/workspace/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+ENV PRISMA_QUERY_ENGINE_BINARY=/workspace/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
 ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl,linux-musl-openssl-3.0.x
 
 # S'assurer que nous sommes dans le bon répertoire pour le démarrage
-WORKDIR /app/server
+WORKDIR /workspace/server
 
 # Commande de démarrage
 CMD ["npm", "start"]
