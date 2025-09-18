@@ -5,6 +5,7 @@ services:
     github:
       repo: Elfspectrals/TP-ProjetAnnuel
       branch: main
+    build_command: npm ci && npm run build
     run_command: npm start
     environment_slug: node-js
     instance_count: 1
@@ -12,8 +13,6 @@ services:
     envs:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: "8080"
       - key: DATABASE_URL
         value: ${db.DATABASE_URL}
     http_port: 8080
@@ -25,8 +24,8 @@ services:
     github:
       repo: Elfspectrals/TP-ProjetAnnuel
       branch: main
-    build_command: npm run build
-    run_command: serve -s dist -l $PORT
+    build_command: npm ci && npm run build && npm install -g serve
+    run_command: serve -s dist -l 8080
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs
@@ -46,12 +45,13 @@ databases:
     size: db-s-dev-database
     version: "16"
 
-workers:
+jobs:
   - name: db-migrate
     source_dir: /server
     github:
       repo: Elfspectrals/TP-ProjetAnnuel
       branch: main
+    build_command: npm ci
     run_command: npx prisma migrate deploy
     environment_slug: node-js
     instance_count: 1
