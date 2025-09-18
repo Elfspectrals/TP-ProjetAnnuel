@@ -5,28 +5,28 @@ RUN apt-get update && apt-get install -y openssl && apt-get clean && rm -rf /var
 
 WORKDIR /app
 
-# Copier tous les fichiers package.json
+# Copier tous les fichiers package.json et les fichiers de configuration
 COPY package*.json ./
 COPY server/package*.json ./server/
 COPY client/package*.json ./client/
 COPY server/prisma ./server/prisma/
 
-# Installer les dépendances
+# Copier tous les fichiers sources (nécessaire pour les configs TypeScript)
+COPY server ./server/
+COPY client ./client/
+
+# Installer les dépendances du serveur
 WORKDIR /app/server
 RUN npm ci
 
+# Installer les dépendances du client
 WORKDIR /app/client
 RUN npm ci
 
 # Construire le frontend
 RUN npm run build
 
-# Retourner au serveur et copier tout le code
-WORKDIR /app
-COPY server ./server/
-COPY client ./client/
-
-# Construire le backend
+# Retourner au serveur et construire le backend
 WORKDIR /app/server
 RUN npx prisma generate
 RUN npm run build
