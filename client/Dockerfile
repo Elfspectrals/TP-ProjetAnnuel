@@ -17,11 +17,11 @@ RUN npm run build
 # Installer un serveur web léger pour servir les fichiers statiques
 RUN npm install -g serve
 
-# Exposer le port
-EXPOSE 8080
+# Exposer le port (DigitalOcean utilise $PORT)
+EXPOSE $PORT
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
 
-# Commande de démarrage
-CMD ["serve", "-s", "dist", "-l", "8080"]
+# Commande de démarrage avec variable PORT dynamique
+CMD serve -s dist -l $PORT

@@ -24,8 +24,8 @@ RUN npm run build
 # Supprimer les dépendances de développement après le build
 RUN npm prune --omit=dev
 
-# Exposer le port
-EXPOSE 8080
+# Exposer le port (DigitalOcean utilise $PORT)
+EXPOSE $PORT
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
