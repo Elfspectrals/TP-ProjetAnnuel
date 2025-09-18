@@ -14,14 +14,12 @@ COPY . .
 # Construire l'application
 RUN npm run build
 
-# Installer un serveur web léger pour servir les fichiers statiques
-RUN npm install -g serve
-
 # Exposer le port (DigitalOcean utilise $PORT)
-EXPOSE $PORT
+EXPOSE 8080
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
+ENV PORT=8080
 
-# Commande de démarrage avec variable PORT dynamique
-CMD serve -s dist -l $PORT
+# Commande de démarrage
+CMD ["npm", "start"]

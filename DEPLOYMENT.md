@@ -79,6 +79,22 @@ If you need to run migrations manually:
 2. Access the server component console
 3. Run: `npx prisma migrate deploy`
 
+### 3.1. Environment Variables Required
+
+Make sure these environment variables are set in DigitalOcean:
+
+**Server:**
+
+- `NODE_ENV=production`
+- `PORT=8080`
+- `DATABASE_URL=${db.DATABASE_URL}` (auto-provided by DigitalOcean)
+
+**Client:**
+
+- `NODE_ENV=production`
+- `PORT=8080`
+- `VITE_API_URL=${server.PUBLIC_URL}` (auto-provided by DigitalOcean)
+
 ### 4. Monitoring and Logs
 
 - View application logs in the DigitalOcean dashboard under Runtime Logs

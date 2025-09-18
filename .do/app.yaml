@@ -30,7 +30,7 @@ services:
       branch: main
       deploy_on_push: true
     build_command: npm ci && npm run build
-    run_command: serve -s dist -l $PORT
+    run_command: npm start
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs
@@ -40,6 +40,8 @@ services:
         value: production
       - key: VITE_API_URL
         value: ${server.PUBLIC_URL}
+      - key: PORT
+        value: "8080"
     routes:
       - path: /
     health_check:
