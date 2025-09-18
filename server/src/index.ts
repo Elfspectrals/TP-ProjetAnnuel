@@ -107,8 +107,14 @@ if (process.env.NODE_ENV === "production") {
       });
       console.log(`✅ Dependencies installed:\n${installOutput}`);
 
-      console.log(`🔨 Building frontend (skipping TypeScript check)...`);
-      // Skip TypeScript compilation and build directly with Vite
+      console.log(`📦 Installing Vite (if missing)...`);
+      const viteInstallOutput = execSync("npm install --save-dev vite @vitejs/plugin-react", {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      console.log(`✅ Vite installed:\n${viteInstallOutput}`);
+
+      console.log(`🔨 Building frontend with Vite...`);
       const buildOutput = execSync("npx vite build", {
         encoding: "utf8",
         stdio: ["pipe", "pipe", "pipe"],
