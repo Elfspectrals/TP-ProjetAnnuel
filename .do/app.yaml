@@ -1,38 +1,38 @@
 name: tp-projet-annuel
 services:
-  - name: server
-    type: web
-    source_dir: /server
-    github:
-      repo: Elfspectrals/TP-ProjetAnnuel
-      branch: main
-    build_command: npm ci && npm run build
-    run_command: npm start
-    environment_slug: node-js
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    envs:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        value: ${db.DATABASE_URL}
-    http_port: 8080
-    routes:
-      - path: /api
+- name: api
+  type: web
+  source_dir: /server
+  github:
+    repo: Elfspectrals/TP-ProjetAnnuel
+    branch: main
+  build_command: npm ci && npm run build
+  run_command: npm start
+  environment_slug: node-js
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: DATABASE_URL
+    value: ${db.DATABASE_URL}
+  routes:
+  - path: /api
 
-  - name: client
-    type: static_site
-    source_dir: /client
-    github:
-      repo: Elfspectrals/TP-ProjetAnnuel
-      branch: main
-    build_command: npm ci && npm run build
-    output_dir: /dist
-    envs:
-      - key: VITE_API_URL
-        value: ${server.PUBLIC_URL}/api
-    routes:
-      - path: /
+- name: web
+  type: static_site
+  source_dir: /client
+  github:
+    repo: Elfspectrals/TP-ProjetAnnuel
+    branch: main
+  build_command: npm ci && npm run build
+  output_dir: /dist
+  envs:
+  - key: VITE_API_URL
+    value: ${api.PUBLIC_URL}/api
+  routes:
+  - path: /
 
 databases:
   - name: db
@@ -42,16 +42,15 @@ databases:
     version: "16"
 
 jobs:
-  - name: db-migrate
-    source_dir: /server
-    github:
-      repo: Elfspectrals/TP-ProjetAnnuel
-      branch: main
-    build_command: npm ci
-    run_command: npx prisma migrate deploy
-    environment_slug: node-js
-    instance_count: 1
-    instance_size_slug: basic-xxs
-    envs:
-      - key: DATABASE_URL
-        value: ${db.DATABASE_URL}
+- name: db-migrate
+  kind: PRE_DEPLOY
+  source_dir: /server
+  github:
+    repo: Elfspectrals/TP-ProjetAnnuel
+    branch: main
+  build_command: npm ci
+  run_command: npx prisma migrate deploy
+  environment_slug: node-js
+  envs:
+  - key: DATABASE_URL
+    value: ${db.DATABASE_URL}
