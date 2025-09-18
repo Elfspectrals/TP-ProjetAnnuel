@@ -37,9 +37,13 @@ RUN npm run build
 # Vérifier que les fichiers de sortie existent
 RUN ls -la dist/ && test -f dist/index.js
 RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.ts
 
 # Supprimer les dépendances de développement
 RUN npm prune --omit=dev
+
+# Rendre le script de démarrage exécutable
+RUN chmod +x start.sh
 
 # Exposer le port
 EXPOSE 8080

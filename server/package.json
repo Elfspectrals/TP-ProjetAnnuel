@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "test -f dist/index.js && node dist/index.js || (npm run build && node dist/index.js)",
+    "start": "./start.sh",
     "dev": "tsx watch src/index.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -13,8 +13,9 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "db:seed": "tsx src/seed.ts",
-    "postinstall": "prisma generate",
-    "prisma:generate-all": "PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl-openssl-3.0.x prisma generate"
+    "postinstall": "npm run prisma:generate-all",
+    "prisma:generate-all": "PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl-openssl-3.0.x prisma generate",
+    "prepare-production": "npm run prisma:generate-all && npm run build"
   },
   "dependencies": {
     "@prisma/client": "^5.7.1",
