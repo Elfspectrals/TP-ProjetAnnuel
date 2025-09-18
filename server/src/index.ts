@@ -21,8 +21,28 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir les fichiers statiques du frontend en production
 if (process.env.NODE_ENV === "production") {
-  const clientPath = path.join(__dirname, "../../client/dist");
-  app.use(express.static(clientPath));
+  // Try multiple possible paths for frontend files
+  const possiblePaths = [
+    path.join(__dirname, "../../client/dist"),
+    path.join(process.cwd(), "client/dist"),
+    path.join("/app/client/dist"),
+    path.join("/workspace/client/dist")
+  ];
+  
+  let clientPath = possiblePaths[0]; // default
+  for (const testPath of possiblePaths) {
+    if (fs.existsSync(testPath)) {
+      clientPath = testPath;
+      console.log(`Found frontend files at: ${clientPath}`);
+      break;
+    }
+  }
+  
+  if (!fs.existsSync(clientPath)) {
+    console.error(`Frontend files not found. Tried paths:`, possiblePaths);
+  } else {
+    app.use(express.static(clientPath));
+  }
 }
 
 // Route API info (déplacée vers /api)
@@ -139,20 +159,36 @@ if (process.env.NODE_ENV === "production") {
       });
     }
     // Sinon, servir le frontend
-    const clientPath = path.join(__dirname, "../../client/dist/index.html");
-    console.log(`Serving frontend for ${req.path}, file path: ${clientPath}`);
+    // Try multiple possible paths for index.html
+    const possibleIndexPaths = [
+      path.join(__dirname, "../../client/dist/index.html"),
+      path.join(process.cwd(), "client/dist/index.html"),
+      path.join("/app/client/dist/index.html"),
+      path.join("/workspace/client/dist/index.html")
+    ];
+    
+    let indexPath = possibleIndexPaths[0]; // default
+    for (const testPath of possibleIndexPaths) {
+      if (fs.existsSync(testPath)) {
+        indexPath = testPath;
+        break;
+      }
+    }
+    
+    console.log(`Serving frontend for ${req.path}, file path: ${indexPath}`);
 
     // Vérifier que le fichier existe
-    if (!fs.existsSync(clientPath)) {
-      console.error(`Frontend file not found: ${clientPath}`);
+    if (!fs.existsSync(indexPath)) {
+      console.error(`Frontend file not found. Tried paths:`, possibleIndexPaths);
       return res.status(404).json({
         error: "Frontend not found",
-        path: clientPath,
+        path: indexPath,
+        triedPaths: possibleIndexPaths,
         message: "The frontend build files are missing",
       });
     }
 
-    res.sendFile(clientPath);
+    res.sendFile(indexPath);
   });
 } else {
   // Gestion des erreurs 404 en développement
