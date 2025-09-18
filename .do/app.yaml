@@ -12,13 +12,15 @@ services:
     http_port: 8080
     instance_count: 1
     instance_size_slug: basic-xxs
-    envs:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: "8080"
-      - key: DATABASE_URL
-        value: ${db.DATABASE_URL}
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "8080"
+  - key: DATABASE_URL
+    value: ${db.DATABASE_URL}
+  - key: PRISMA_QUERY_ENGINE_LIBRARY
+    value: /workspace/server/node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node
     health_check:
       http_path: /health
     routes:

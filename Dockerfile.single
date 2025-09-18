@@ -28,7 +28,7 @@ RUN npm run build
 
 # Retourner au serveur et construire le backend
 WORKDIR /app/server
-RUN npx prisma generate
+RUN npx prisma generate --generator client
 RUN npm run build
 
 # Vérifier que le fichier de sortie existe
@@ -43,6 +43,7 @@ EXPOSE 8080
 # Variables d'environnement
 ENV NODE_ENV=production
 ENV PORT=8080
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/app/server/node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node
 
 # S'assurer que nous sommes dans le bon répertoire pour le démarrage
 WORKDIR /app/server
