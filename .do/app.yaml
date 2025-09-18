@@ -6,12 +6,10 @@ services:
   github:
     repo: Elfspectrals/TP-ProjetAnnuel
     branch: main
-  build_command: npm ci && npm run build
-  run_command: npm start
-  environment_slug: node-js
+  dockerfile_path: server/Dockerfile
+  http_port: 8080
   instance_count: 1
   instance_size_slug: basic-xxs
-  http_port: 8080
   envs:
   - key: NODE_ENV
     value: production
@@ -21,25 +19,29 @@ services:
   - path: /api
 
 - name: web
-  type: static_site
+  type: web
   source_dir: /client
   github:
     repo: Elfspectrals/TP-ProjetAnnuel
     branch: main
-  build_command: npm ci && npm run build
-  output_dir: /dist
+  dockerfile_path: client/Dockerfile
+  http_port: 8080
+  instance_count: 1
+  instance_size_slug: basic-xxs
   envs:
+  - key: NODE_ENV
+    value: production
   - key: VITE_API_URL
     value: ${api.PUBLIC_URL}/api
   routes:
   - path: /
 
 databases:
-  - name: db
-    engine: PG
-    num_nodes: 1
-    size: db-s-dev-database
-    version: "16"
+- name: db
+  engine: PG
+  num_nodes: 1
+  size: db-s-dev-database
+  version: "16"
 
 jobs:
 - name: db-migrate
@@ -48,9 +50,8 @@ jobs:
   github:
     repo: Elfspectrals/TP-ProjetAnnuel
     branch: main
-  build_command: npm ci
+  dockerfile_path: server/Dockerfile
   run_command: npx prisma migrate deploy
-  environment_slug: node-js
   envs:
   - key: DATABASE_URL
     value: ${db.DATABASE_URL}
