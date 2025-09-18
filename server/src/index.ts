@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import path from "path";
 import { PrismaClient } from "@prisma/client";
 
 // Charger les variables d'environnement
@@ -16,6 +17,12 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir les fichiers statiques du frontend en production
+if (process.env.NODE_ENV === "production") {
+  const clientPath = path.join(__dirname, "../../client/dist");
+  app.use(express.static(clientPath));
+}
 
 // Routes de base
 app.get("/", (req, res) => {
@@ -119,14 +126,31 @@ app.post("/api/posts", async (req, res) => {
   }
 });
 
-// Gestion des erreurs 404
-app.use("*", (req, res) => {
-  res.status(404).json({
-    error: "Route not found",
-    path: req.originalUrl,
-    method: req.method,
+// Fallback pour le frontend en production (SPA)
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    // Si c'est une route API qui n'existe pas, retourner 404 JSON
+    if (req.path.startsWith("/api")) {
+      return res.status(404).json({
+        error: "API route not found",
+        path: req.originalUrl,
+        method: req.method,
+      });
+    }
+    // Sinon, servir le frontend
+    const clientPath = path.join(__dirname, "../../client/dist/index.html");
+    res.sendFile(clientPath);
   });
-});
+} else {
+  // Gestion des erreurs 404 en développement
+  app.use("*", (req, res) => {
+    res.status(404).json({
+      error: "Route not found",
+      path: req.originalUrl,
+      method: req.method,
+    });
+  });
+}
 
 // Gestion des erreurs globales
 app.use(
