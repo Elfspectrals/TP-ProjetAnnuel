@@ -101,11 +101,18 @@ if (process.env.NODE_ENV === "production") {
       console.log(`📍 Now in: ${process.cwd()}`);
 
       console.log(`📦 Installing client dependencies...`);
-      const installOutput = execSync("npm ci", { 
+      const installOutput = execSync("npm ci", {
         encoding: "utf8",
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ["pipe", "pipe", "pipe"],
       });
       console.log(`✅ Dependencies installed:\n${installOutput}`);
+
+      console.log(`📦 Installing missing TypeScript types...`);
+      const typesOutput = execSync("npm install --save-dev @types/react @types/react-dom", {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
+      });
+      console.log(`✅ TypeScript types installed:\n${typesOutput}`);
 
       console.log(`🔨 Running npm run build...`);
       const buildOutput = execSync("npm run build", {
