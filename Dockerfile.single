@@ -42,6 +42,9 @@ RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.t
 # Vérifier que le frontend est bien construit
 RUN ls -la ../client/dist/ && test -f ../client/dist/index.html
 
+# Copy frontend files to workspace location (for DigitalOcean App Platform)
+RUN mkdir -p /workspace/client && cp -r ../client/dist /workspace/client/
+
 # Supprimer les dépendances de développement (seulement du serveur)
 RUN npm prune --omit=dev
 
