@@ -26,43 +26,43 @@ if (process.env.NODE_ENV === "production") {
   console.log(`  Current working directory: ${process.cwd()}`);
   console.log(`  __dirname: ${__dirname}`);
   console.log(`  __filename: ${__filename}`);
-  
+
   // Explore file system structure
   try {
     console.log(`\n📁 Directory Contents:`);
     console.log(`  Contents of process.cwd() (${process.cwd()}):`);
     const cwdContents = fs.readdirSync(process.cwd());
-    console.log(`    [${cwdContents.join(', ')}]`);
-    
-    const parentDir = path.join(process.cwd(), '..');
+    console.log(`    [${cwdContents.join(", ")}]`);
+
+    const parentDir = path.join(process.cwd(), "..");
     console.log(`  Contents of parent directory (${parentDir}):`);
     const parentContents = fs.readdirSync(parentDir);
-    console.log(`    [${parentContents.join(', ')}]`);
-    
+    console.log(`    [${parentContents.join(", ")}]`);
+
     // Check for client directory in various locations
     const clientLocations = [
-      path.join(process.cwd(), 'client'),
-      path.join(parentDir, 'client'),
-      '/workspace/client',
-      '/app/client'
+      path.join(process.cwd(), "client"),
+      path.join(parentDir, "client"),
+      "/workspace/client",
+      "/app/client",
     ];
-    
+
     for (const clientLoc of clientLocations) {
       if (fs.existsSync(clientLoc)) {
         console.log(`  Found client directory at: ${clientLoc}`);
         const clientContents = fs.readdirSync(clientLoc);
-        console.log(`    Contents: [${clientContents.join(', ')}]`);
-        
-        const distPath = path.join(clientLoc, 'dist');
+        console.log(`    Contents: [${clientContents.join(", ")}]`);
+
+        const distPath = path.join(clientLoc, "dist");
         if (fs.existsSync(distPath)) {
           console.log(`    Found dist directory at: ${distPath}`);
           const distContents = fs.readdirSync(distPath);
-          console.log(`    Dist contents: [${distContents.join(', ')}]`);
+          console.log(`    Dist contents: [${distContents.join(", ")}]`);
         }
       }
     }
   } catch (e) {
-    console.error(`  ❌ Error exploring directories: ${e.message}`);
+    console.error(`  ❌ Error exploring directories: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   // Try to find frontend files
@@ -89,7 +89,7 @@ if (process.env.NODE_ENV === "production") {
     console.log(`\n✅ SUCCESS: Serving frontend from: ${clientPath}`);
     app.use(express.static(clientPath));
   }
-  
+
   console.log(`\n🚀 Frontend setup complete.\n`);
 }
 
