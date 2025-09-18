@@ -31,6 +31,9 @@ WORKDIR /app/server
 RUN npx prisma generate
 RUN npm run build
 
+# Vérifier que le fichier de sortie existe
+RUN ls -la dist/ && test -f dist/index.js
+
 # Supprimer les dépendances de développement
 RUN npm prune --omit=dev
 
@@ -40,6 +43,9 @@ EXPOSE 8080
 # Variables d'environnement
 ENV NODE_ENV=production
 ENV PORT=8080
+
+# S'assurer que nous sommes dans le bon répertoire pour le démarrage
+WORKDIR /app/server
 
 # Commande de démarrage
 CMD ["npm", "start"]
