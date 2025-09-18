@@ -18,10 +18,10 @@ RUN npm run build
 RUN npm install -g serve
 
 # Exposer le port
-EXPOSE 5173
+EXPOSE 8080
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
 
 # Commande de démarrage
-CMD ["serve", "-s", "dist", "-l", "5173"]
+CMD ["serve", "-s", "dist", "-l", "8080"]

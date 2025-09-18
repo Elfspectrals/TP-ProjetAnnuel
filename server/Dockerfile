@@ -25,11 +25,11 @@ RUN npm run build
 RUN npm prune --omit=dev
 
 # Exposer le port
-EXPOSE 3000
+EXPOSE 8080
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=8080
 
 # Commande de démarrage
 CMD ["npm", "start"]
