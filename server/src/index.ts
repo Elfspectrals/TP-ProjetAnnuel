@@ -100,10 +100,17 @@ if (process.env.NODE_ENV === "production") {
       process.chdir("/workspace/client");
       console.log(`📍 Now in: ${process.cwd()}`);
 
-      console.log(`🔨 Running npm run build...`);
-      const buildOutput = execSync("npm run build", { 
+      console.log(`📦 Installing client dependencies...`);
+      const installOutput = execSync("npm ci", { 
         encoding: "utf8",
         stdio: ['pipe', 'pipe', 'pipe']
+      });
+      console.log(`✅ Dependencies installed:\n${installOutput}`);
+
+      console.log(`🔨 Running npm run build...`);
+      const buildOutput = execSync("npm run build", {
+        encoding: "utf8",
+        stdio: ["pipe", "pipe", "pipe"],
       });
       console.log(`✅ Build output:\n${buildOutput}`);
 
