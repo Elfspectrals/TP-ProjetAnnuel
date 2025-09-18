@@ -25,7 +25,7 @@ WORKDIR /workspace/client
 RUN npm ci
 
 # Construire le frontend
-RUN npm run build
+RUN echo "🔨 Building frontend..." && npm run build && echo "✅ Frontend build complete" && ls -la dist/
 
 # Retourner au serveur et construire le backend
 WORKDIR /workspace/server
@@ -41,7 +41,7 @@ RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/libquery_
 RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.ts
 
 # Vérifier que le frontend est bien construit
-RUN ls -la ../client/dist/ && test -f ../client/dist/index.html
+RUN echo "🔍 Checking frontend build..." && ls -la ../client/ && ls -la ../client/dist/ && test -f ../client/dist/index.html && echo "✅ Frontend verification passed"
 
 # Supprimer les dépendances de développement (seulement du serveur)
 RUN npm prune --omit=dev

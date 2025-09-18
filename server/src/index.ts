@@ -62,7 +62,11 @@ if (process.env.NODE_ENV === "production") {
       }
     }
   } catch (e) {
-    console.error(`  ❌ Error exploring directories: ${e instanceof Error ? e.message : String(e)}`);
+    console.error(
+      `  ❌ Error exploring directories: ${
+        e instanceof Error ? e.message : String(e)
+      }`
+    );
   }
 
   // Try to find frontend files
