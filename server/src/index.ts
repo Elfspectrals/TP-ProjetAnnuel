@@ -89,6 +89,38 @@ if (process.env.NODE_ENV === "production") {
 
   if (!clientPath) {
     console.error(`\n❌ CRITICAL: No frontend files found!`);
+    console.log(`\n🔧 ATTEMPTING RUNTIME BUILD...`);
+    
+    // Try to build frontend at runtime as emergency fallback
+    try {
+      const { execSync } = require('child_process');
+      console.log(`📍 Current directory: ${process.cwd()}`);
+      console.log(`🔄 Changing to client directory...`);
+      
+      process.chdir('/workspace/client');
+      console.log(`📍 Now in: ${process.cwd()}`);
+      
+      console.log(`🔨 Running npm run build...`);
+      const buildOutput = execSync('npm run build', { encoding: 'utf8' });
+      console.log(`Build output: ${buildOutput}`);
+      
+      console.log(`📁 Checking for dist directory...`);
+      if (fs.existsSync('./dist')) {
+        console.log(`✅ SUCCESS: Frontend built at runtime!`);
+        const distContents = fs.readdirSync('./dist');
+        console.log(`Dist contents: [${distContents.join(', ')}]`);
+        
+        // Go back to server directory
+        process.chdir('/workspace/server');
+        app.use(express.static('/workspace/client/dist'));
+        clientPath = '/workspace/client/dist';
+      } else {
+        console.log(`❌ Build failed - no dist directory created`);
+      }
+    } catch (buildError) {
+      console.error(`❌ Runtime build failed: ${buildError.message}`);
+      process.chdir('/workspace/server'); // Ensure we're back in server dir
+    }
   } else {
     console.log(`\n✅ SUCCESS: Serving frontend from: ${clientPath}`);
     app.use(express.static(clientPath));
