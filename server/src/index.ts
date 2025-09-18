@@ -21,40 +21,76 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir les fichiers statiques du frontend en production
 if (process.env.NODE_ENV === "production") {
-  // Debug: Log current working directory and __dirname
-  console.log(`Current working directory: ${process.cwd()}`);
-  console.log(`__dirname: ${__dirname}`);
+  // 🔍 COMPREHENSIVE DEBUG INFO
+  console.log(`\n🔍 FRONTEND DEBUG ANALYSIS:`);
+  console.log(`  Current working directory: ${process.cwd()}`);
+  console.log(`  __dirname: ${__dirname}`);
+  console.log(`  __filename: ${__filename}`);
+  
+  // Explore file system structure
+  try {
+    console.log(`\n📁 Directory Contents:`);
+    console.log(`  Contents of process.cwd() (${process.cwd()}):`);
+    const cwdContents = fs.readdirSync(process.cwd());
+    console.log(`    [${cwdContents.join(', ')}]`);
+    
+    const parentDir = path.join(process.cwd(), '..');
+    console.log(`  Contents of parent directory (${parentDir}):`);
+    const parentContents = fs.readdirSync(parentDir);
+    console.log(`    [${parentContents.join(', ')}]`);
+    
+    // Check for client directory in various locations
+    const clientLocations = [
+      path.join(process.cwd(), 'client'),
+      path.join(parentDir, 'client'),
+      '/workspace/client',
+      '/app/client'
+    ];
+    
+    for (const clientLoc of clientLocations) {
+      if (fs.existsSync(clientLoc)) {
+        console.log(`  Found client directory at: ${clientLoc}`);
+        const clientContents = fs.readdirSync(clientLoc);
+        console.log(`    Contents: [${clientContents.join(', ')}]`);
+        
+        const distPath = path.join(clientLoc, 'dist');
+        if (fs.existsSync(distPath)) {
+          console.log(`    Found dist directory at: ${distPath}`);
+          const distContents = fs.readdirSync(distPath);
+          console.log(`    Dist contents: [${distContents.join(', ')}]`);
+        }
+      }
+    }
+  } catch (e) {
+    console.error(`  ❌ Error exploring directories: ${e.message}`);
+  }
 
-  // Try multiple possible paths for frontend files
+  // Try to find frontend files
   const possiblePaths = [
-    path.join(__dirname, "../../client/dist"),  // Development: /workspace/server/dist -> /workspace/client/dist
-    path.join(process.cwd(), "../client/dist"),  // From /workspace/server -> /workspace/client/dist
-    path.join("/workspace/client/dist"),         // Absolute workspace path
-    path.join("/app/client/dist"),               // Alternative absolute path
+    path.join(process.cwd(), "../client/dist"),
+    path.join("/workspace/client/dist"),
+    path.join(__dirname, "../../client/dist"),
+    path.join("/app/client/dist"),
   ];
 
   let clientPath = null;
-  console.log("Checking frontend paths:");
+  console.log(`\n🔍 Testing frontend paths:`);
   for (const testPath of possiblePaths) {
     const exists = fs.existsSync(testPath);
-    console.log(`  ${testPath} - ${exists ? "EXISTS" : "NOT FOUND"}`);
+    console.log(`    ${testPath} - ${exists ? "✅ EXISTS" : "❌ NOT FOUND"}`);
     if (exists && !clientPath) {
       clientPath = testPath;
     }
   }
 
   if (!clientPath) {
-    console.error(
-      `❌ Frontend files not found in any of the expected locations.`
-    );
-    console.error(
-      `Available directories in process.cwd():`,
-      fs.readdirSync(process.cwd())
-    );
+    console.error(`\n❌ CRITICAL: No frontend files found!`);
   } else {
-    console.log(`✅ Using frontend files from: ${clientPath}`);
+    console.log(`\n✅ SUCCESS: Serving frontend from: ${clientPath}`);
     app.use(express.static(clientPath));
   }
+  
+  console.log(`\n🚀 Frontend setup complete.\n`);
 }
 
 // Route API info (déplacée vers /api)
@@ -173,10 +209,10 @@ if (process.env.NODE_ENV === "production") {
     // Sinon, servir le frontend
     // Try multiple possible paths for index.html
     const possibleIndexPaths = [
-      path.join(__dirname, "../../client/dist/index.html"),    // Development: /workspace/server/dist -> /workspace/client/dist
-      path.join(process.cwd(), "../client/dist/index.html"),   // From /workspace/server -> /workspace/client/dist
-      path.join("/workspace/client/dist/index.html"),          // Absolute workspace path
-      path.join("/app/client/dist/index.html"),                // Alternative absolute path
+      path.join(__dirname, "../../client/dist/index.html"), // Development: /workspace/server/dist -> /workspace/client/dist
+      path.join(process.cwd(), "../client/dist/index.html"), // From /workspace/server -> /workspace/client/dist
+      path.join("/workspace/client/dist/index.html"), // Absolute workspace path
+      path.join("/app/client/dist/index.html"), // Alternative absolute path
     ];
 
     let indexPath = possibleIndexPaths[0]; // default
