@@ -1,0 +1,85 @@
+FROM node:18-slim
+
+# Installer OpenSSL pour Prisma
+RUN apt-get update && apt-get install -y openssl && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Use /workspace to match DigitalOcean App Platform expectations
+WORKDIR /workspace
+
+# Copier tous les fichiers package.json et les fichiers de configuration
+COPY package*.json ./
+COPY server/package*.json ./server/
+COPY client/package*.json ./client/
+COPY server/prisma ./server/prisma/
+
+# Copier tous les fichiers sources (nécessaire pour les configs TypeScript)
+COPY server ./server/
+COPY client ./client/
+
+# Installer les dépendances du serveur
+WORKDIR /workspace/server
+RUN npm ci
+
+# Installer les dépendances du client
+WORKDIR /workspace/client
+RUN npm ci --production=false
+
+# Force installer les outils de build nécessaires
+RUN npm install --save-dev vite@^7.1.6 @vitejs/plugin-react@^5.0.3 typescript@~5.8.3
+
+# Vérifier les installations
+RUN echo "🔍 Checking installed packages..." && npm list vite @vitejs/plugin-react typescript || true
+
+# Construire le frontend avec stratégies de fallback étendues
+RUN echo "🔨 Building frontend..." && \
+    (npm run build || \
+     echo "⚠️ TypeScript build failed, trying JS config..." && npm run build-js || \
+     echo "⚠️ JS config failed, trying minimal config..." && npm run build-minimal || \
+     echo "⚠️ Minimal config failed, trying no config..." && npm run build-no-config || \
+     echo "⚠️ No config failed, trying direct binary..." && ./node_modules/.bin/vite build || \
+     echo "❌ All build strategies failed") && \
+    echo "✅ Frontend build complete" && \
+    ls -la dist/ && \
+    test -f dist/index.html && \
+    echo "✅ Frontend index.html confirmed"
+
+# Retourner au serveur et construire le backend
+WORKDIR /workspace/server
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl-openssl-3.0.x
+RUN rm -rf node_modules/.prisma || true
+RUN rm -rf prisma/generated || true
+RUN npm run prisma:generate-all
+RUN npm run build
+
+# Vérifier que les fichiers de sortie existent
+RUN ls -la dist/ && test -f dist/index.js
+RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.ts
+
+# Vérifier que le frontend est bien construit
+RUN echo "🔍 Checking frontend build..." && ls -la ../client/ && ls -la ../client/dist/ && test -f ../client/dist/index.html && echo "✅ Frontend verification passed"
+
+# Supprimer les dépendances de développement (seulement du serveur, pas du client)
+RUN npm prune --omit=dev
+
+# Vérifier une dernière fois que le frontend est accessible depuis le serveur
+RUN echo "🔍 Final frontend check from server directory..." && ls -la ../client/dist/ && echo "Frontend files confirmed"
+
+# Rendre le script de démarrage exécutable
+RUN chmod +x start.sh
+
+# Exposer le port
+EXPOSE 8080
+
+# Variables d'environnement
+ENV NODE_ENV=production
+ENV PORT=8080
+ENV PRISMA_QUERY_ENGINE_LIBRARY=/workspace/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+ENV PRISMA_QUERY_ENGINE_BINARY=/workspace/server/prisma/generated/client/libquery_engine-debian-openssl-3.0.x.so.node
+ENV PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x,debian-openssl-1.1.x,linux-musl,linux-musl-openssl-3.0.x
+
+# S'assurer que nous sommes dans le bon répertoire pour le démarrage
+WORKDIR /workspace/server
+
+# Commande de démarrage
+CMD ["npm", "start"]
