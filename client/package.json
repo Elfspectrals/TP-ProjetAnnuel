@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build-js": "vite build --config vite.config.js",
+    "build-minimal": "vite build --config vite.config.minimal.js",
+    "build-no-config": "vite build --mode production",
     "build-fallback": "npx vite build --config vite.config.js",
     "lint": "eslint .",
     "preview": "vite preview",

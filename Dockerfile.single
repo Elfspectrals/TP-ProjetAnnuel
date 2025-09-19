@@ -30,11 +30,13 @@ RUN npm install --save-dev vite@^7.1.6 @vitejs/plugin-react@^5.0.3 typescript@~5
 # Vérifier les installations
 RUN echo "🔍 Checking installed packages..." && npm list vite @vitejs/plugin-react typescript || true
 
-# Construire le frontend avec stratégies de fallback
+# Construire le frontend avec stratégies de fallback étendues
 RUN echo "🔨 Building frontend..." && \
     (npm run build || \
      echo "⚠️ TypeScript build failed, trying JS config..." && npm run build-js || \
-     echo "⚠️ JS config failed, trying fallback..." && npm run build-fallback || \
+     echo "⚠️ JS config failed, trying minimal config..." && npm run build-minimal || \
+     echo "⚠️ Minimal config failed, trying no config..." && npm run build-no-config || \
+     echo "⚠️ No config failed, trying direct binary..." && ./node_modules/.bin/vite build || \
      echo "❌ All build strategies failed") && \
     echo "✅ Frontend build complete" && \
     ls -la dist/ && \

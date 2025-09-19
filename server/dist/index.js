@@ -111,12 +111,32 @@ if (process.env.NODE_ENV === "production") {
                     console.log(`✅ Build output (JS config):\n${buildOutput}`);
                 }
                 catch (error2) {
-                    console.log(`⚠️ JS config failed, trying fallback...`);
-                    buildOutput = execSync("npm run build-fallback", {
-                        encoding: "utf8",
-                        stdio: ["pipe", "pipe", "pipe"],
-                    });
-                    console.log(`✅ Build output (fallback):\n${buildOutput}`);
+                    console.log(`⚠️ JS config failed, trying minimal config...`);
+                    try {
+                        buildOutput = execSync("npm run build-minimal", {
+                            encoding: "utf8",
+                            stdio: ["pipe", "pipe", "pipe"],
+                        });
+                        console.log(`✅ Build output (minimal config):\n${buildOutput}`);
+                    }
+                    catch (error3) {
+                        console.log(`⚠️ Minimal config failed, trying no config...`);
+                        try {
+                            buildOutput = execSync("npm run build-no-config", {
+                                encoding: "utf8",
+                                stdio: ["pipe", "pipe", "pipe"],
+                            });
+                            console.log(`✅ Build output (no config):\n${buildOutput}`);
+                        }
+                        catch (error4) {
+                            console.log(`⚠️ No config failed, trying direct npx...`);
+                            buildOutput = execSync("./node_modules/.bin/vite build", {
+                                encoding: "utf8",
+                                stdio: ["pipe", "pipe", "pipe"],
+                            });
+                            console.log(`✅ Build output (direct binary):\n${buildOutput}`);
+                        }
+                    }
                 }
             }
             console.log(`📁 Checking for dist directory...`);
