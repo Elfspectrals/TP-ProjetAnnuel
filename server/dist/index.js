@@ -86,12 +86,12 @@ if (process.env.NODE_ENV === "production") {
                 stdio: ["pipe", "pipe", "pipe"],
             });
             console.log(`✅ Dependencies installed:\n${installOutput}`);
-            console.log(`📦 Installing Vite (if missing)...`);
-            const viteInstallOutput = execSync("npm install --save-dev vite @vitejs/plugin-react", {
+            console.log(`📦 Installing Vite and dependencies (if missing)...`);
+            const viteInstallOutput = execSync("npm install --save-dev vite @vitejs/plugin-react typescript && npm ci", {
                 encoding: "utf8",
                 stdio: ["pipe", "pipe", "pipe"],
             });
-            console.log(`✅ Vite installed:\n${viteInstallOutput}`);
+            console.log(`✅ Vite and dependencies installed:\n${viteInstallOutput}`);
             console.log(`🔨 Building frontend with Vite...`);
             const buildOutput = execSync("npx vite build", {
                 encoding: "utf8",

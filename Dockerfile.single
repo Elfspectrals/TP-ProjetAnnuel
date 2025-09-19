@@ -24,8 +24,11 @@ RUN npm ci
 WORKDIR /workspace/client
 RUN npm ci
 
+# Vérifier et installer Vite explicitement si nécessaire
+RUN npm list vite || npm install --save-dev vite @vitejs/plugin-react typescript
+
 # Construire le frontend
-RUN echo "🔨 Building frontend..." && npm run build && echo "✅ Frontend build complete" && ls -la dist/
+RUN echo "🔨 Building frontend..." && npm run build && echo "✅ Frontend build complete" && ls -la dist/ && test -f dist/index.html
 
 # Retourner au serveur et construire le backend
 WORKDIR /workspace/server
@@ -43,8 +46,11 @@ RUN ls -la prisma/generated/client/ && test -f prisma/generated/client/index.d.t
 # Vérifier que le frontend est bien construit
 RUN echo "🔍 Checking frontend build..." && ls -la ../client/ && ls -la ../client/dist/ && test -f ../client/dist/index.html && echo "✅ Frontend verification passed"
 
-# Supprimer les dépendances de développement (seulement du serveur)
+# Supprimer les dépendances de développement (seulement du serveur, pas du client)
 RUN npm prune --omit=dev
+
+# Vérifier une dernière fois que le frontend est accessible depuis le serveur
+RUN echo "🔍 Final frontend check from server directory..." && ls -la ../client/dist/ && echo "Frontend files confirmed"
 
 # Rendre le script de démarrage exécutable
 RUN chmod +x start.sh
