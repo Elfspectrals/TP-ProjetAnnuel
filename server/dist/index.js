@@ -93,11 +93,32 @@ if (process.env.NODE_ENV === "production") {
             });
             console.log(`✅ Vite and dependencies installed:\n${viteInstallOutput}`);
             console.log(`🔨 Building frontend with Vite...`);
-            const buildOutput = execSync("npx vite build", {
-                encoding: "utf8",
-                stdio: ["pipe", "pipe", "pipe"],
-            });
-            console.log(`✅ Build output:\n${buildOutput}`);
+            let buildOutput;
+            try {
+                buildOutput = execSync("npm run build", {
+                    encoding: "utf8",
+                    stdio: ["pipe", "pipe", "pipe"],
+                });
+                console.log(`✅ Build output (TypeScript):\n${buildOutput}`);
+            }
+            catch (error1) {
+                console.log(`⚠️ TypeScript build failed, trying JS config...`);
+                try {
+                    buildOutput = execSync("npm run build-js", {
+                        encoding: "utf8",
+                        stdio: ["pipe", "pipe", "pipe"],
+                    });
+                    console.log(`✅ Build output (JS config):\n${buildOutput}`);
+                }
+                catch (error2) {
+                    console.log(`⚠️ JS config failed, trying fallback...`);
+                    buildOutput = execSync("npm run build-fallback", {
+                        encoding: "utf8",
+                        stdio: ["pipe", "pipe", "pipe"],
+                    });
+                    console.log(`✅ Build output (fallback):\n${buildOutput}`);
+                }
+            }
             console.log(`📁 Checking for dist directory...`);
             if (fs_1.default.existsSync("./dist")) {
                 console.log(`✅ SUCCESS: Frontend built at runtime!`);
