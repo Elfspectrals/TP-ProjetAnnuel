@@ -71,10 +71,11 @@ if (process.env.NODE_ENV === "production") {
 
   // Try to find frontend files
   const possiblePaths = [
-    path.join(process.cwd(), "../client/dist"),
-    path.join("/workspace/client/dist"),
-    path.join(__dirname, "../../client/dist"),
-    path.join("/app/client/dist"),
+    path.join(__dirname, "../../client/dist"), // From server/dist to client/dist
+    path.join(process.cwd(), "../client/dist"), // From server/ to client/dist
+    path.join("/workspace/client/dist"), // Absolute workspace path
+    path.join("/app/client/dist"), // Alternative absolute path for containers
+    path.join("/home/jerome/TP-ProjetAnnuel/client/dist"), // Local development path
   ];
 
   let clientPath = null;
@@ -108,10 +109,13 @@ if (process.env.NODE_ENV === "production") {
       console.log(`✅ Dependencies installed:\n${installOutput}`);
 
       console.log(`📦 Installing Vite (if missing)...`);
-      const viteInstallOutput = execSync("npm install --save-dev vite @vitejs/plugin-react", {
-        encoding: "utf8",
-        stdio: ["pipe", "pipe", "pipe"],
-      });
+      const viteInstallOutput = execSync(
+        "npm install --save-dev vite @vitejs/plugin-react",
+        {
+          encoding: "utf8",
+          stdio: ["pipe", "pipe", "pipe"],
+        }
+      );
       console.log(`✅ Vite installed:\n${viteInstallOutput}`);
 
       console.log(`🔨 Building frontend with Vite...`);
@@ -265,10 +269,11 @@ if (process.env.NODE_ENV === "production") {
     // Sinon, servir le frontend
     // Try multiple possible paths for index.html
     const possibleIndexPaths = [
-      path.join(__dirname, "../../client/dist/index.html"), // Development: /workspace/server/dist -> /workspace/client/dist
-      path.join(process.cwd(), "../client/dist/index.html"), // From /workspace/server -> /workspace/client/dist
+      path.join(__dirname, "../../client/dist/index.html"), // From server/dist to client/dist
+      path.join(process.cwd(), "../client/dist/index.html"), // From server/ to client/dist
       path.join("/workspace/client/dist/index.html"), // Absolute workspace path
-      path.join("/app/client/dist/index.html"), // Alternative absolute path
+      path.join("/app/client/dist/index.html"), // Alternative absolute path for containers
+      path.join("/home/jerome/TP-ProjetAnnuel/client/dist/index.html"), // Local development path
     ];
 
     let indexPath = possibleIndexPaths[0]; // default
